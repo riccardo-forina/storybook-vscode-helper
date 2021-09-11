@@ -1,0 +1,83 @@
+{
+  "name": "storybook-helper",
+	"displayName": "Storybook helper",
+	"description": "Quickly create Storybook's stories for your React components",
+	"version": "1.0.0",
+	"publisher": "riccardoforina",
+	"engines": {
+		"vscode": "^1.60.0"
+	},
+	"icon": "storybook.ico",
+	"repository": {
+    "type": "git",
+    "url": "https://github.com/riccardo-forina/storybook-vscode-helper"
+  },
+	"homepage": "https://github.com/riccardo-forina/storybook-vscode-helper/blob/main/README.md",
+	"bugs": {
+    "url": "https://github.com/riccardo-forina/storybook-vscode-helper/issues",
+    "email": "riccardo@forina.eu"
+  },
+	"categories": [
+		"Snippets",
+		"Programming Languages"
+	],
+	"activationEvents": [
+        "onCommand:storybook-helper.createStory"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "storybook-helper.createStory",
+				"title": "Create a Storybook story"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "storybook-helper.createStory",
+					"when": "editorLangId == typescriptreact || editorLangId == javascriptreact || editorLangId == typescript || editorLangId == javascript"
+				}
+			]
+		},
+		"snippets": [
+			{
+				"language": "typescriptreact",
+				"path": "./snippets/typescript.json"
+			},
+			{
+				"language": "typescript",
+				"path": "./snippets/typescript.json"
+			},
+			{
+				"language": "javascriptreact",
+				"path": "./snippets/javascript.json"
+			},
+			{
+				"language": "javascript",
+				"path": "./snippets/javascript.json"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "yarn run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "yarn run compile && yarn run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.60.0",
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.2.2",
+		"@types/node": "14.x",
+		"eslint": "^7.27.0",
+		"@typescript-eslint/eslint-plugin": "^4.26.0",
+		"@typescript-eslint/parser": "^4.26.0",
+		"glob": "^7.1.7",
+		"mocha": "^8.4.0",
+		"typescript": "^4.3.2",
+		"vscode-test": "^1.5.2"
+	}
+}

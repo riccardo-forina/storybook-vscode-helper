@@ -1,0 +1,23 @@
+{
+	"Create a Storybook story (js)": {
+		"prefix": "story",
+		"body": [
+			"import React from 'react';",
+			"",
+			"import { ${1:${TM_FILENAME/(.*).stories.jsx?/${1}/}} } from './${2:${TM_FILENAME/(.*).stories.jsx?/${1}/}}';",
+			"",
+			"export default {",
+			"  title: '${3:Components}/${4:${TM_FILENAME/(.*).stories.jsx?/${1}/}}',",
+			"  component: ${1:${TM_FILENAME/(.*).stories.jsx?/${1}/}},",
+			"  args: {},",
+			"}",
+			"",
+			"const Template = (args) => <${1:${TM_FILENAME/(.*).stories.jsx?/${1}/}} {...args} />;",
+			"",
+			"export const ${5:Story} = Template.bind({});",
+			"$5.args = {};",
+			"$0"
+		],
+		"description": "Create a Storybook story"
+	}
+}

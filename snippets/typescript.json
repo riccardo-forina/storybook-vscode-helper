@@ -1,0 +1,26 @@
+{
+	"Create a Storybook story (ts)": {
+		"prefix": "story",
+		"body": [
+ 			"import { ComponentStory, ComponentMeta } from '@storybook/react';",
+			"import React from 'react';",
+			"",
+			"import { ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}} } from './${2:${TM_FILENAME/(.*).stories.tsx?/${1}/}}';",
+			"",
+			"export default {",
+			"  title: '${3:Components}/${4:${TM_FILENAME/(.*).stories.tsx?/${1}/}}',",
+			"  component: ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}},",
+			"  args: {},",
+			"} as ComponentMeta<typeof ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}}>;",
+			"",
+			"const Template: ComponentStory<typeof ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}}> = (args) => (",
+			"  <${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}} {...args} />",
+			");",
+			"",
+			"export const ${5:Story} = Template.bind({});",
+			"$5.args = {};",
+			"$0"
+		],
+		"description": "Create a Storybook story"
+	}
+}
