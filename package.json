@@ -2,7 +2,7 @@
 	"name": "storybook-helper",
 	"displayName": "Storybook helper",
 	"description": "Quickly create Storybook's stories for your React components",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"publisher": "riccardoforina",
 	"engines": {
 		"vscode": "^1.60.0"

@@ -5,9 +5,9 @@ A Visual Studio Code helper to create Storybook stories from your components rea
 ## Features
 
 
-### `Create a storybook Story` command
+### `Create a Storybook story` command
 
-Open the tsx or jsx file that contains the component for which you want to create a story, then from the command palette run "Create a storybook Story". 
+Open the tsx or jsx file that contains the component for which you want to create a story, then from the command palette run "Create a Storybook story". 
 
 A new _unsaved_ file will be created with the basics of a Storybook story in the Component Story Format (CSF) filled out for you. Move between the placeholders with TAB, customize the names as you want and you are done.
 
@@ -26,7 +26,7 @@ In alternative, you can create a Storybook file in the common format `{Component
 - ☑️ Javascript snippet
 - ☑️ Typescript snippet
 - ☑️ Command palette command to automate the file creation
-- ☐ Make the command unrestand the props taken by the component to automatically fill the arguments with some defaults
+- ☑️ Make the command unrestand the props taken by the component to automatically fill the arguments with some defaults
 
 ## Known Issues
 

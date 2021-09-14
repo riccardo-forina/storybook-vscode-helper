@@ -11,3 +11,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Compile the extension with `esbuild` to remove the dependency with Typescript.
 - Automatic args placeholders for Typescript components.
+
+## [1.1.1]
+
+- Update the README
