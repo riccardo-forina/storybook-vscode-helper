@@ -1,60 +1,141 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { parse, PropItem } from "react-docgen-typescript";
+import {
+  withDefaultConfig,
+  PropItem,
+  PropItemType,
+  ComponentDoc,
+} from "react-docgen-typescript";
 
 function defaultOrPlaceholder(
   defaultValue: null | { value: any },
-  placeholder: any
+  placeholder: string | number
 ) {
   return defaultValue && defaultValue.value ? defaultValue.value : placeholder;
 }
 
-function typeToPlaceholder(
-  type: any,
-  defaultValue: null | { value: any },
-  idx: number
-) {
-  switch (true) {
-    case typeof type === "string" && type.includes("|"):
-      return type.split("|")[0].trim();
-    case type === "number":
+function typeValue(
+  type: PropItemType,
+  defaultValue: null | { value: any }
+): string | any[] {
+  switch (type.name) {
+    case "enum":
+      if (Array.isArray(type.value)) {
+        return type.value.map((v) => v.value);
+      }
+    case "number":
       return defaultOrPlaceholder(defaultValue, 123);
-    case type === "Date":
+    case "Date":
       return defaultOrPlaceholder(defaultValue, `new Date()`);
-    case type === "string":
-      return `'${defaultOrPlaceholder(defaultValue, type)}'`;
+    case "string":
+      return `'${defaultOrPlaceholder(defaultValue, type.name)}'`;
     default:
-      return `'${type.replace("}", "\\}")}' as unknown as any`;
+      return `'${type.name.replace("}", "\\}")}' as unknown as any`;
   }
 }
 
-function propInfoToString(key: string, idx: number, info: PropItem): string {
-  return `${key}: \${${idx + 3}:${typeToPlaceholder(
-    info.type.name,
-    info.defaultValue,
-    idx
-  )}}`;
+function propItemToStoryArg(key: string, idx: number, info: PropItem): string {
+  const placeholder = typeValue(info.type, info.defaultValue);
+  return `${key}: \${${idx + 3}${
+    Array.isArray(placeholder)
+      ? `|${placeholder.join(",")}|`
+      : `:${placeholder}`
+  }}`;
 }
 
 export async function createStory(componentUri: vscode.Uri) {
   const dirname = path.dirname(componentUri.fsPath);
   const basename = path.basename(componentUri.fsPath);
-  const ext = path.extname(componentUri.fsPath);
-  const isJs = ext.startsWith(".js");
   const storyname = basename.replace(/.(t|j)sx?/, ".stories.$1sx");
+  const storyUri = vscode.Uri.parse(path.join(dirname, storyname));
 
-  const newFile = vscode.Uri.parse(path.join(dirname, storyname));
+  const isJs = path.extname(componentUri.fsPath).startsWith(".js");
+  (await isJs)
+    ? createStoryFromJs(storyUri)
+    : createStoryFromTs(
+        componentUri.fsPath,
+        storyUri,
+        path.parse(basename).name
+      );
+}
 
+export async function createStoryFromJs(storyUri: vscode.Uri) {
+  await checkExistingStory(storyUri, "javascriptreact");
+  await vscode.commands.executeCommand("editor.action.insertSnippet", {
+    name: "Create a Storybook story (js)",
+  });
+}
+
+export async function createStoryFromTs(
+  componentFsPath: string,
+  storyUri: vscode.Uri,
+  importName: string
+) {
+  const parseResult = withDefaultConfig({
+    shouldExtractLiteralValuesFromEnum: true,
+  }).parse(componentFsPath);
+
+  const components = parseResult;
+  let component: ComponentDoc | undefined;
+
+  switch (components.length) {
+    case 0:
+      vscode.window.showErrorMessage("No exported components found");
+      return;
+    case 1:
+      component = components[0];
+      break;
+    default:
+      const items = components.map((c) => c.displayName);
+      const selection = await vscode.window.showQuickPick(items, {
+        canPickMany: false,
+        placeHolder:
+          "There are many components exported, which one do you want to use for the story?",
+      });
+      component = components.find((c) => c.displayName === selection)!;
+  }
+
+  await checkExistingStory(storyUri, "typescriptreact");
+
+  const args = Object.entries(component.props).reduce<string[]>(
+    (args, [key, info], idx) => [...args, propItemToStoryArg(key, idx, info)],
+    []
+  );
+  const tmpl = `import { ComponentStory, ComponentMeta } from '@storybook/react';
+import React from 'react';
+
+import { ${component.displayName} } from './${importName}';
+
+export default {
+  title: '\${1:Components}/\${2:${component.displayName}}',
+  component: ${component.displayName},
+  args: {
+${args.map((a) => `    ${a}`).join(",\n")}
+  },
+} as ComponentMeta<typeof ${component.displayName}>;
+
+const Template: ComponentStory<typeof ${component.displayName}> = (args) => (
+  <${component.displayName} {...args} />
+);
+
+export const \${${3 + args.length}:Story} = Template.bind({});
+$${3 + args.length}.args = {};
+`;
+  const snippet = new vscode.SnippetString(tmpl);
+  vscode.window.activeTextEditor?.insertSnippet(snippet);
+}
+
+async function checkExistingStory(storyUri: vscode.Uri, languageId: string) {
   try {
-    await vscode.workspace.fs.stat(newFile);
-    const document = await vscode.workspace.openTextDocument(newFile);
+    await vscode.workspace.fs.stat(storyUri);
+    const document = await vscode.workspace.openTextDocument(storyUri);
     await vscode.window.showTextDocument(document);
 
-    const answer = await vscode.window.showInformationMessage(
-      "Found an existing stories file for this component. Do you want to replace it with a new one?",
-      "Yes",
-      "No"
-    );
+    const answer = await await vscode.window.showQuickPick(["Yes", "No"], {
+      canPickMany: false,
+      placeHolder:
+        "Found an existing stories file, do you want to replace it with a new one?",
+    });
     if (answer === "No") {
       return;
     }
@@ -68,53 +149,13 @@ export async function createStory(componentUri: vscode.Uri) {
     vscode.window.activeTextEditor?.edit((e) => e.replace(fullRange, ""));
   } catch (e) {
     const document = await vscode.workspace.openTextDocument(
-      newFile.with({ scheme: "untitled" })
+      storyUri.with({ scheme: "untitled" })
     );
     await vscode.window.showTextDocument(document);
     vscode.workspace.onDidOpenTextDocument(async (doc) => {
       if (doc === document) {
-        await vscode.languages.setTextDocumentLanguage(
-          document,
-          isJs ? "javascriptreact" : "typescriptreact"
-        );
+        await vscode.languages.setTextDocumentLanguage(document, languageId);
       }
-    });
-  }
-
-  const [compDoc] = parse(componentUri.fsPath);
-  if (compDoc) {
-    const args = Object.entries(compDoc.props).reduce<string[]>(
-      (args, [key, info], idx) => [...args, propInfoToString(key, idx, info)],
-      []
-    );
-    const tmpl = `import { ComponentStory, ComponentMeta } from '@storybook/react';
-import React from 'react';
-
-import { ${compDoc.displayName} } from './${path.parse(basename).name}';
-
-export default {
-  title: '\${1:Components}/\${2:${compDoc.displayName}}',
-  component: ${compDoc.displayName},
-  args: {
-${args.map((a) => `    ${a}`).join(",\n")}
-  },
-} as ComponentMeta<typeof ${compDoc.displayName}>;
-
-const Template: ComponentStory<typeof ${compDoc.displayName}> = (args) => (
-  <${compDoc.displayName} {...args} />
-);
-
-export const \${${3 + args.length}:Story} = Template.bind({});
-$${3 + args.length}.args = {};
-`;
-    console.log(tmpl);
-    const snippet = new vscode.SnippetString(tmpl);
-    vscode.window.activeTextEditor?.insertSnippet(snippet);
-  } else {
-    await vscode.commands.executeCommand("editor.action.insertSnippet", {
-      name: isJs
-        ? "Create a Storybook story (js)"
-        : "Create a Storybook story (ts)",
     });
   }
 }
