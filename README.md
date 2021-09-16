@@ -41,3 +41,11 @@ Initial release of storybook-vscode-helper
 
 Compile the extension with `esbuild` to remove the dependency with Typescript.
 Automatic args placeholders for Typescript components.
+
+### 1.1.1
+
+Updated README.md
+
+### 1.2.0
+
+For Typescript files, detect if multiple components are exported and prompt the user to select the one to use.

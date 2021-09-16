@@ -15,3 +15,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [1.1.1]
 
 - Update the README
+
+## [1.2.0]
+
+- For Typescript files, detect if multiple components are exported and prompt the user to select the one to use.
