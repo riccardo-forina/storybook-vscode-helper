@@ -36,11 +36,10 @@ function typeValue(
 
 function propItemToStoryArg(key: string, idx: number, info: PropItem): string {
   const placeholder = typeValue(info.type, info.defaultValue);
-  return `${key}: \${${idx + 3}${
-    Array.isArray(placeholder)
-      ? `|${placeholder.join(",")}|`
-      : `:${placeholder}`
-  }}`;
+  return `${key}: \${${idx + 3}${Array.isArray(placeholder)
+    ? `|${placeholder.join(",")}|`
+    : `:${placeholder}`
+    }}`;
 }
 
 export async function createStory(componentUri: vscode.Uri) {
@@ -53,10 +52,10 @@ export async function createStory(componentUri: vscode.Uri) {
   (await isJs)
     ? createStoryFromJs(storyUri)
     : createStoryFromTs(
-        componentUri.fsPath,
-        storyUri,
-        path.parse(basename).name
-      );
+      componentUri.fsPath,
+      storyUri,
+      path.parse(basename).name
+    );
 }
 
 export async function createStoryFromJs(storyUri: vscode.Uri) {
@@ -101,25 +100,26 @@ export async function createStoryFromTs(
     (args, [key, info], idx) => [...args, propItemToStoryArg(key, idx, info)],
     []
   );
-  const tmpl = `import { ComponentStory, ComponentMeta } from '@storybook/react';
-import React from 'react';
+  const tmpl = `import React from 'react';
+import type { StoryObj, Meta } from '@storybook/react';
 
 import { ${component.displayName} } from './${importName}';
 
-export default {
+const meta = {
   title: '\${1:Components}/\${2:${component.displayName}}',
   component: ${component.displayName},
   args: {
-${args.map((a) => `    ${a}`).join(",\n")}
+    ${args.map((a) => `    ${a}`).join(",\n")}
   },
-} as ComponentMeta<typeof ${component.displayName}>;
+} satisfies Meta<typeof ${component.displayName}>;
+export default meta;
 
-const Template: ComponentStory<typeof ${component.displayName}> = (args) => (
-  <${component.displayName} {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const \${${3 + args.length}:Story} = Template.bind({});
-$${3 + args.length}.args = {};
+export const \${${3 + args.length}:Default}: Story = {
+  args: {},
+  render: (props) => <${component.displayName} {...props}/>
+}
 `;
   const snippet = new vscode.SnippetString(tmpl);
   vscode.window.activeTextEditor?.insertSnippet(snippet);
