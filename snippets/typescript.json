@@ -1,9 +1,34 @@
 {
-	"Create a Storybook story (ts)": {
+	"Create a Storybook story (CSF 3)": {
 		"prefix": "story",
 		"body": [
- 			"import { ComponentStory, ComponentMeta } from '@storybook/react';",
 			"import React from 'react';",
+			"import type { Meta, StoryObj } from '@storybook/react';",
+			"",
+			"import { ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}} } from './${2:${TM_FILENAME/(.*).stories.tsx?/${1}/}}';",
+			"",
+			"const meta = {",
+			"  title: '${3:Components}/${4:${TM_FILENAME/(.*).stories.tsx?/${1}/}}',",
+			"  component: ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}},",
+			"  args: {},",
+			"} satisfies Meta<typeof ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}}>;",
+			"export default meta;",
+			"",
+			"type Story = StoryObj<typeof meta>;",
+			"",
+			"export const ${5:Default}: Story = {",
+			"  args: {},",
+			"  render: (props) => <${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}} {...props}/>",
+			"}",
+			"$0"
+		],
+		"description": "Create a Storybook story using the CSF 3.0 syntax."
+	},
+	"Create a Storybook story (CSF 2)": {
+		"prefix": "story2",
+		"body": [
+			"import React from 'react';",
+			"import type { StoryFn, Meta } from '@storybook/react';",
 			"",
 			"import { ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}} } from './${2:${TM_FILENAME/(.*).stories.tsx?/${1}/}}';",
 			"",
@@ -11,16 +36,12 @@
 			"  title: '${3:Components}/${4:${TM_FILENAME/(.*).stories.tsx?/${1}/}}',",
 			"  component: ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}},",
 			"  args: {},",
-			"} as ComponentMeta<typeof ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}}>;",
+			"} as Meta<typeof ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}}>;",
 			"",
-			"const Template: ComponentStory<typeof ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}}> = (args) => (",
-			"  <${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}} {...args} />",
-			");",
-			"",
-			"export const ${5:Story} = Template.bind({});",
+			"export const ${5:Default}: StoryFn<typeof ${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}}> = (args) => <${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}} {...args}/>;",
 			"$5.args = {};",
 			"$0"
 		],
-		"description": "Create a Storybook story"
+		"description": "Create a Storybook story using the CSF 2.0 syntax."
 	}
 }

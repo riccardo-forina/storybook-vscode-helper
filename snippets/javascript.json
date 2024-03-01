@@ -1,23 +1,47 @@
 {
-	"Create a Storybook story (js)": {
+	"Create a Storybook story (CSF 3)": {
 		"prefix": "story",
 		"body": [
 			"import React from 'react';",
 			"",
 			"import { ${1:${TM_FILENAME/(.*).stories.jsx?/${1}/}} } from './${2:${TM_FILENAME/(.*).stories.jsx?/${1}/}}';",
 			"",
+			"/** @satisfies {import('@storybook/react').Meta<typeof ${1:${TM_FILENAME/(.*).stories.jsx?/${1}/}}>} */",
+			"const meta = {",
+			"  title: '${3:Components}/${4:${TM_FILENAME/(.*).stories.jsx?/${1}/}}',",
+			"  component: ${1:${TM_FILENAME/(.*).stories.jsx?/${1}/}},",
+			"  args: {},",
+			"}",
+			"export default meta;",
+			"",
+			"/** @type {import('@storybook/react').StoryObj<typeof meta>} */",
+			"export const Default = {",
+			"  args: {},",
+			"  render: (props) => <${1:${TM_FILENAME/(.*).stories.tsx?/${1}/}} {...props}/>",
+			"}",
+			"$0"
+		],
+		"description": "Create a Storybook story using the CSF 3.0 syntax."
+	},
+	"Create a Storybook story (CSF 2)": {
+		"prefix": "story2",
+		"body": [
+			"import React from 'react';",
+			"",
+			"import { ${1:${TM_FILENAME/(.*).stories.jsx?/${1}/}} } from './${2:${TM_FILENAME/(.*).stories.jsx?/${1}/}}';",
+			"",
+			"/** @type {import('@storybook/react').Meta<typeof ${1:${TM_FILENAME/(.*).stories.jsx?/${1}/}}>} */",
 			"export default {",
 			"  title: '${3:Components}/${4:${TM_FILENAME/(.*).stories.jsx?/${1}/}}',",
 			"  component: ${1:${TM_FILENAME/(.*).stories.jsx?/${1}/}},",
 			"  args: {},",
 			"}",
 			"",
-			"const Template = (args) => <${1:${TM_FILENAME/(.*).stories.jsx?/${1}/}} {...args} />;",
-			"",
-			"export const ${5:Story} = Template.bind({});",
+			"/** @type {import('@storybook/react').StoryFn<typeof ${1:${TM_FILENAME/(.*).stories.jsx?/${1}/}}>} */",
+			"export const Default = (args) => <${5:Story} {...args} />",
 			"$5.args = {};",
 			"$0"
 		],
-		"description": "Create a Storybook story"
+		"description": "Create a Storybook story using the CSF 2.0 syntax."
 	}
 }
