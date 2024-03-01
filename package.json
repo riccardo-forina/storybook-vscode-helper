@@ -63,7 +63,7 @@
 		"vscode:prepublish": "yarn run esbuild-base --minify",
 		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
 		"esbuild": "yarn run esbuild-base --sourcemap",
-		"watch": "tsc -watch -p ./",
+		"watch": "yarn run esbuild-base --sourcemap --watch",
 		"test-compile": "tsc -p ./",
 		"pretest": "yarn run esbuild && yarn run lint",
 		"lint": "eslint src --ext ts",
