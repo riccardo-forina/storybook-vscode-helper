@@ -49,3 +49,7 @@ Updated README.md
 ### 1.2.0
 
 For Typescript files, detect if multiple components are exported and prompt the user to select the one to use.
+
+### 1.2.0
+
+Add the new CSF3.0 snippets under `story` and in the story generation using the command palette, update types and keep the CSF2.0 snippets under `story2`
